@@ -8,20 +8,21 @@ import { protect } from "./middleware/auth";
 const app = express();
 // initialise express server
 const server = http.createServer(app);
-const { Server } = socket;
 
-// initialise for post data
+// built-in middleware function in Express. It parses incoming requests with JSON payloads and is based on body-parser.
 app.use(express.json());
+
+// initialise cors
+app.use(cors());
+
+const { Server } = socket;
 
 // initialise SocketIo
 const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// initialise cors
-app.use(cors());
-
-// an object to store connectedUsers
+// create an object to store connectedUsers
 const connectedUsers: Object = {};
 
 io.use(async (socket, next) => {
@@ -56,6 +57,7 @@ export const sendNotification = (friendName: string, name: string) => {
   return true;
 };
 
+// a http route uses to receive post request that user want to send the other user request
 app.post("/notification", async (req, res) => {
   const { name, friendName } = req.body;
   const result = sendNotification(friendName, name);
